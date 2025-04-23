@@ -1,0 +1,191 @@
+{% extends "_layouts/cp" %}
+
+{% set title = "Zoho Mail Settings"|t('zoho-mail') %}
+
+
+{% block content %}
+
+
+<script type="text/javascript">
+	function addZeptoSuccessMessage(message) {
+		document.getElementById("zmail_messages").style.display = 'block';
+		document.getElementById("zmail_msg_class").className  ="zmail_messages_success";
+		document.getElementById("zmail-msgText").innerHTML = message;
+		setTimeout(function() {document.getElementById("zmail_messages").style.display = 'none' }, 5000);
+		window.scrollTo(0,0)
+    }
+	function addZeptoErrorMessage(message) {
+		document.getElementById("zmail_messages").style.display = 'block';
+		document.getElementById("zmail_msg_class").className  ="zmail_messages_error";
+		document.getElementById("zmail-msgText").innerHTML = message;
+		setTimeout(function() {document.getElementById("zmail_messages").style.display = 'none' }, 5000);
+		window.scrollTo(0,0)
+    }
+</script>
+
+
+
+
+
+
+
+<div class="zmail-settings">
+    
+    <div class="zmail-main">
+	<div id="zmail_messages" style="display:none;"><div class="page"><div class="zmail_messages_success" id="zmail_msg_class"><div id="zmail-msgText">	</div></div></div></div>
+		<div purpose="accordion-box" id="zmail_account_setup_ab" is_configured="" class="accordion-body  {% if not is_account_configured %} zmail-accordion-active {% else %} zmail-accordion-inactive {% endif %} ">
+        <button purpose="configure-accordion" class="zmailaccordion__trigger {% if not is_account_configured %} zmailaccordion__trigger--expanded {% else %} zmailaccordion__trigger--configured {% endif %}">
+            <span class="zmailaccordion__title">
+			Configure Account            </span>
+			            <i class="zmaili-angle-down"></i>
+        </button>
+        <form name="f" class="zmailaccordion__content" id="zept-oauth-form" method="post" >
+       	    
+            <span class="zmailsetup-step-desc">
+               Configure your Zoho Mail account in this plugin to send emails from Craft CMS. To generate client ID and client secret, click <a href="javascript:void(0)" purpose="zmail_generate_client">here</a>.                
+                
+            </span>
+            
+            <div class="zmailform-element">
+                <label class="zmailinput-label">Where is your account hosted?</label>
+                <div class="zmailtext zmailselect">
+                    <div class="zmailtext-field-wrapper">
+                        
+                        <div class="zmailtext__adorn " style="width:100%;">
+                       
+                        <select class="form--input form--input--select" name="zohomail_domain"  {% if is_account_configured %}disabled {% endif %}>
+                        <option value="zoho.com" {% if domain == 'zoho.com' %} selected="selected" {% endif %}>zohomail.zoho.com</option>
+                        <option value="zoho.eu" {% if domain == 'zoho.eu' %} selected="selected" {% endif %}>zohomail.zoho.eu</option>
+                        <option value="zoho.in" {% if domain == 'zoho.in' %} selected="selected" {% endif %}>zohomail.zoho.in</option>
+                        <option value="zoho.com.cn" {% if domain == 'zoho.com.cn' %} selected="selected" {% endif %}>zohomail.zoho.com.cn</option>
+                        <option value="zoho.com.au" {% if domain == 'zoho.com.au' %} selected="selected" {% endif %}>zohomail.zoho.com.au</option>
+						<option value="zoho.jp" {% if domain == 'zoho.jp' %} selected="selected" {% endif %}>zohomail.zoho.jp</option>
+						<option value="zohocloud.ca" {% if domain == 'zohocloud.ca' %} selected="selected" {% endif %}>zohomail.zohocloud.ca</option>
+						<option value="zoho.sa" {% if domain == 'zoho.sa' %} selected="selected" {% endif %}>zohomail.zoho.sa</option>
+                        </select></div>
+                    </div>
+                </div>
+            </div>
+            <div class="zmailform-element">
+                <label class="zmailinput-label">
+                    Client ID                </label>
+                <div class="zmailtext">
+                    <div class="zmailtext-field-wrapper">
+						<input class="zmailtext__box" type="text" value="{{ clientId }}" placeholder="Enter valid client ID" id="zohomail_client_id" required="" {% if is_account_configured %} disabled {% endif %}>
+                    </div>
+                </div>
+            </div>
+            <div class="zmailform-element">
+                <label class="zmailinput-label">
+                    Client Secret                </label>
+                <div class="zmailtext">
+                    <div class="zmailtext-field-wrapper">
+						<input type="password" value="{{ clientSecret }}" class="zmailtext__box" id="zohomail_client_secret" placeholder="Enter valid client secret"  required="" {% if is_account_configured %} disabled {% endif %}> 
+                    </div>
+                </div>
+            </div>
+            <div class="zmailform-element">
+                <label class="zmailinput-label">
+                   Authorization redirect URL                </label>
+                <div class="zmailtext">
+                    <div class="zmailtext-field-wrapper">
+						<input type="text" readonly="readonly" value="{{ callbackurl }}" class="zmailtext__box" id="zmail_redirection_url"  required=""> 
+                    </div>
+                </div>
+				<i class="form__row-info">Copy this URL into Redirect URI field of your Client Id creation  </i>
+				<i class="tib-copy"><a href="javascript:" purpose="copyredirecturi">Copy text</a></i>
+            </div>
+			
+            <div >
+						<br /><button class="zmailbtn" type="button" id="zohomail_authorize_btn" name="submit" class="button button-primary button-large">Authorize 
+							</button> &nbsp;
+							
+				</div>
+				
+            <span class="zmailsetup-step-desc {% if is_account_configured == false %} zmail-dispNone {% endif %} ">
+                Wish to authorize with other data?                <button class="zmailbtn zmailbtn--flat zmailbtn--sm" purpose="reauthorize">
+                    <span class="zmailbtn__text ">Edit</span>
+                </button>
+            </span>
+				
+        </form>
+        </div>
+		<div purpose="accordion-box" id="zmail_send_mail_config_ab" is_configured="true" class="accordion-body {% if is_account_configured %} zmail-accordion-active{% else %}zmail-accordion-inactive zmail-accordion-disabled {% endif %}"">
+		<button purpose="configure-accordion" class="zmailaccordion__trigger {% if is_account_configured %}zmailaccordion__trigger--expanded {% else %} zmailaccordion__trigger--collapsed {% endif %}">
+            <span class="zmailaccordion__title">
+                Email Configuration            </span>
+			<span class="zmailsetup-status zmailsetup-status--completed zmail-dispNone">
+                <i class="zmaili-circle-check"></i>
+                Confgiured
+            </span>
+			<i class="zmaili-angle-down"></i>
+        </button>
+        
+        <form name="mailconfig" class="zmailaccordion__content" id="zmail-config-form" method="post" action=""  >
+            <input type="hidden" name="options" value="saveEmailSettings"/>
+            <span class="zmailsetup-step-desc">
+				Configure your email for Craft CMS
+            </span>
+        
+          <div class="zmailform-element">
+                <label class="zmailinput-label">
+                    From name               </label>
+                <div class="zmailtext">
+                    <div class="zmailtext-field-wrapper">
+						<input type="text" value="{{ from_name }}" id="zmail_from_name" class="zmailtext__box" id="zohomail_client_secret" placeholder="Enter from name"  required="" {% if is_mail_configured %} disabled {% endif %}> 
+                    </div>
+                </div>
+            </div>
+        <div class="zmailform-element">
+            <label class="zmailinput-label">From email</label>
+            <div class="zmailtext zmailselect">
+                <div class="zmailtext-field-wrapper">
+                        
+                    <div class="zmailtext__adorn " style="width:100%;">
+                       
+                        <select class="form--input form--input--select" name="from_address" id="zmail_from_address" {% if is_mail_configured %}disabled{% endif%}>
+                            <option value="-1" >Select</option>
+                            
+							{% for emailId in email_list %}
+								<option value="{{ emailId }}" {% if(from_address == emailId) %} selected="true" {% endif%} >{{emailId}}</option>
+							{% endfor %}	
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div >
+
+  
+        
+						<br /><button  type="button" id="zohomail_mailconfig_btn" class="zmailbtn button button-primary button-large {% if is_mail_configured%} zmail-dispNone {% endif %}"/>Save
+                        </button> &nbsp;
+						<button type="button" id="zohomail_test_btn" name="test" class="zmailbtn button button-primary button-large {% if is_mail_configured == false%} zmail-dispNone {% endif %}"" >Test mail  
+							</button>
+							
+				</div>
+                <span purpose="zmail_modify_config" class="zmailsetup-step-desc  {% if is_mail_configured == false %} zmail-dispNone {% endif %}">
+                To modify email configuration,                 
+                <input type="button" class="zmailbtn zmailbtn--flat zmailbtn--sm" purpose="reconfigure" value="click here.">
+            </span>
+        
+            
+        </form>
+				 </div>
+		</div>
+	<div class="zmailpopover" style="display:none" id="zmailalert">
+        <header class="zmailpopover__header">
+            <h3 purpose="alertheader"></h3>
+            <div class="zmailpopover__header__actions">
+                <button class="zmailbtn zmailbtn--default zmailbtn--sm" purpose="clsbtn">
+                    <i class="zmaili-close"></i>
+                </button>
+            </div>
+        </header>
+        <div class="zmailpopover__content" purpose="alertcontent">
+            
+        </div>
+    </div>
+    </div>
+
+{% endblock %}
