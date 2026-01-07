@@ -32,7 +32,7 @@ use yii\web\Response;
  */
 class ZohoMail extends Plugin
 {
-    public string $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.1';
     /**
      * @inheritdoc
      */
@@ -53,8 +53,9 @@ class ZohoMail extends Plugin
         $request = Craft::$app->getRequest();
         $this->_registerCpRoutes();
 
-        $eventType = MailerHelper::EVENT_REGISTER_MAILER_TRANSPORT_TYPES;
-
+        $eventType =defined(sprintf('%s::EVENT_REGISTER_MAILER_TRANSPORT_TYPES', MailerHelper::class))
+        ? MailerHelper::EVENT_REGISTER_MAILER_TRANSPORT_TYPES // Craft 4
+        : MailerHelper::EVENT_REGISTER_MAILER_TRANSPORTS; // Craft 5+
         Event::on(MailerHelper::class, $eventType,
             function (RegisterComponentTypesEvent $event) {
                 $event->types[] = ZohoMailAdapter::class;  
@@ -103,6 +104,15 @@ class ZohoMail extends Plugin
         parent::install();
         $install = new Install();
         $install->up();
+    }
+        /**
+     * @inheritdoc
+     */
+    public function uninstall():void {
+        
+        Craft::$app->getProjectConfig()->remove("zohomail.settings");
+        parent::uninstall();
+       
     }
 
  
