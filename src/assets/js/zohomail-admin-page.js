@@ -9,7 +9,7 @@ $( document ).ready(function() {
     $("#zohomail_authorize_btn").on("click",function(){
         $self = $(this);
         $.ajax({
-            url: Craft.getUrl('admin/zohomail/configureoauth'),
+            url: Craft.getUrl(Craft.cpTrigger+'/zohomail/configureoauth'),
             type: 'POST',
             dataType: 'json',
             data: {
@@ -78,7 +78,7 @@ $( document ).ready(function() {
     $("#zohomail_test_btn").on("click",function(){
       $self = $(this);
       $.ajax({
-          url: Craft.getUrl('admin/zohomail/testmail'),
+          url: Craft.getUrl(Craft.cpTrigger+'/zohomail/testmail'),
           type: 'POST',
           dataType: 'json',
           data: {
@@ -113,7 +113,7 @@ $( document ).ready(function() {
   $("#zohomail_mailconfig_btn").on("click",function(){
     $self = $(this);
     $.ajax({
-        url: Craft.getUrl('admin/zohomail/saveEmail'),
+        url: Craft.getUrl(Craft.cpTrigger+'/zohomail/saveEmail'),
         type: 'POST',
         dataType: 'json',
         data: {

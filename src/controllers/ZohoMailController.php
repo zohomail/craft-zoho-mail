@@ -189,39 +189,41 @@ class ZohoMailController extends Controller
         }
         if($is_account_configured) {
             $zmailApi = new ZohoMailApi();
-            $account_id = $zmailSettings["account_id"];
+            if(isset($zmailSettings["account_id"])) {
+                $account_id = $zmailSettings["account_id"];
+            }
+            
             $emailDetail = $zmailApi->getZohoMailAccountDetails();
             
-            
-            if(!isset($account_id) && !in_array($account_id,$emailDetail) ){
-                $is_account_configured = false;
+            if(empty($emailDetail)) {
+                $is_account_configured =false;
                 $is_mail_configured = false;
+            }
+            else if(!isset($account_id) || (isset($account_id) && !array_key_exists($account_id,$emailDetail)) ){
+               $is_mail_configured = false;
+               foreach($emailDetail as $emailAccountId => $accountEmailList) {
+                foreach ($accountEmailList as $email) {
+                    $emailIdList[] = $email;
+                }
+                 
+               }
 
             }
             else{
-                if(isset($emailDetail[$account_id]))
-                {
-                    $emailIdList = $emailDetail[$account_id];
-                    if(count($emailIdList) == 0) {
-                        $is_mail_configured = false;
-                        $is_account_configured = false;
-                    }else {
-                        $is_account_configured = true;
-                        if(isset($zmailSettings['from_address'])) {
-                            $from_address = $zmailSettings['from_address'];
-                        }
-                        if(in_array($from_address,$emailIdList)) {
-                            $is_mail_configured = true;
-                            $from_name = $zmailSettings['from_name'];
-                        }
+                $emailIdList = $emailDetail[$account_id];
+                if(count($emailIdList) == 0) {
+                    $is_mail_configured = false;
+                    $is_account_configured = false;
+                }else {
+                    $is_account_configured = true;
+                    if(isset($zmailSettings['from_address'])) {
+                        $from_address = $zmailSettings['from_address'];
+                    }
+                    if(in_array($from_address,$emailIdList)) {
+                        $is_mail_configured = true;
+                        $from_name = $zmailSettings['from_name'];
                     }
                 }
-                else{
-                    $is_account_configured = false;
-                    $is_mail_configured = false;
-                }
-                
-
             }
             
         }
@@ -256,7 +258,7 @@ class ZohoMailController extends Controller
 
     private function getCallBackUrl()
     {
-        return Craft::$app->getRequest()->getHostInfo().'/admin/zohomail/callback';
+        return Craft::$app->getRequest()->getHostInfo().'/'.Craft::$app->getConfig()->getGeneral()->cpTrigger.'/zohomail/callback';
     }
     public function asHtml($content)
     {
