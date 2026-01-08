@@ -32,7 +32,7 @@ use yii\web\Response;
  */
 class ZohoMail extends Plugin
 {
-    public string $schemaVersion = '1.2';
+    public string $schemaVersion = '1.3';
     /**
      * @inheritdoc
      */
